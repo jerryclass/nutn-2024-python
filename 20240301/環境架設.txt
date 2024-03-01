@@ -3,7 +3,8 @@
 	雲端主機: 如果不方便建立虛擬主機可以利用 AWS/Google Cloud 開設一台免費的機器.
 
 2.	安裝 mobaxterm 應用程式
-	安裝 ssh-server / ubuntu 22.04
+	安裝 ssh-server / ubuntu 22.04 (自建虛擬主機才需要)
+		sudo su
 		apt-get update
 		apt-get install ssh
 
