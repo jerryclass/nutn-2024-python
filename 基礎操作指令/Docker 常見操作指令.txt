@@ -1,0 +1,17 @@
+# 利用 Docker images 建立映像檔
+docker build -t nutn-my-python .
+
+# 查詢 docker 所有的 images
+docker images
+
+# 利用 nutn-my-python 執行 hello.py
+docker run -v "$(pwd)":/app nutn-my-python python /app/hello.py
+
+# 查詢 docker 所有的 contailer
+docker ps -a
+
+# 移除指定的 contailer
+docker rm {id}
+
+# 移除指定的 images
+docker rmi {id}
