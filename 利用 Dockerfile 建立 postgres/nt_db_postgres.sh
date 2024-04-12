@@ -3,16 +3,21 @@
 IMAGE_NAME="nutn-my-postgres"
 command=$1
 
+# check container is exist
+check_container_exists() {
+    if docker ps -a --format '{{.Names}}' | grep -q 'nutn-my-postgres-container'; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 if [[ "$(docker images -q $IMAGE_NAME 2> /dev/null)" == "" ]]; then
 	echo "Docker image $IMAGE_NAME not found. Building..."
 	docker build -f Postgres/Dockerfile -t $IMAGE_NAME .
 fi
 
-# check docker container is exist
-if docker ps -a --format '{{.Names}}' | grep -q 'nutn-my-postgres-container'; then
-    echo "Container exists"
-else
-    echo "Container does not exist"
+if ! check_container_exists; then
 	docker run --name nutn-my-postgres-container -d $IMAGE_NAME
 fi
 
