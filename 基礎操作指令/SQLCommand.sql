@@ -7,3 +7,5 @@ CREATE TABLE users (
 );
 
 INSERT INTO users ("year", "area", "total_count", "high_grade_count") VALUES (2023, '安南區', 60000, 200);
+
+SELECT * FROM users;
