@@ -18,7 +18,7 @@ if [[ "$(docker images -q $IMAGE_NAME 2> /dev/null)" == "" ]]; then
 fi
 
 if ! check_container_exists; then
-	docker run --name nutn-my-postgres-container -d $IMAGE_NAME
+	docker run --name nutn-my-postgres-container -p 5432:5432 -d $IMAGE_NAME
 fi
 
 if [ "$command" = "start" ]; then

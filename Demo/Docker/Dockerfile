@@ -4,7 +4,7 @@ FROM python:3.8
 # 將工作目錄指定為 /app
 WORKDIR /app
 
-RUN pip install requests
+RUN pip install requests psycopg2
 
 # 將當前目錄的檔案複製到工作目錄中
 COPY . .

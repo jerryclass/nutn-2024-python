@@ -1,7 +1,8 @@
 import requests
 import json
+import psycopg2
 
-
+# string convert int
 def str_to_int(str):
     try:
         num = int(str)
@@ -9,8 +10,19 @@ def str_to_int(str):
         num = int(0)
     return num
 
+# connect to postgres database
+conn = psycopg2.connect(
+    dbname="nutn",
+    user="nutn",
+    password="nutn@password",
+    host="172.18.8.152",
+    port="5432"
+)
+
+# opendata url
 url = 'https://opendataap2.e-land.gov.tw/./resource/files/2021-08-27/6961cfab1067bd0f6faae77af04cda09.json'
 
+# get edu_level data from restful api
 response = requests.get(url, verify=False)
 
 if response.status_code == 200:
@@ -20,24 +32,27 @@ else:
 
 json_string = json.dumps(json_objects).replace(" ", "")
 json_objects = json.loads(json_string)
-# ------------------------------------------------------
 
-
-file_path = 'example.txt'
-with open(file_path, 'w') as file:
-    for json_object in json_objects:
-        if json_object['性別'] == '計':
-            year = json_object['年度']
-            area = json_object['區域']
-            total_num = str_to_int(json_object['總計'])
-            phd_num = str_to_int(json_object['博士畢業'])
-            ms_num = str_to_int(json_object['研究所畢業'])
-
-            high_grade_num = ms_num + phd_num
-            high_rate = high_grade_num/total_num
-
-            file.write(f"年度:{year} 區域:{area} 總人口數:{total_num} 研究所以上學歷人數:{high_grade_num} 所占比例:{high_rate:.4%} \n")
-
+# save edu_level data to postgres database
+cur = conn.cursor()
+for json_object in json_objects:
+    year = str_to_int(json_object['年度'])
+    area = json_object['區域']
+    gender = json_object['性別']
+    literacy = str_to_int(json_object['識字者合計'])
+    phd_completion = str_to_int(json_object['博士畢業'])
+    phd_non_completion = str_to_int(json_object['博士肄業'])
+    ms_completion = str_to_int(json_object['研究所畢業'])
+    ms_non_completion = str_to_int(json_object['研究所肄業'])
+    bs_completion = str_to_int(json_object['大學(含獨立學院)畢業'])
+    bs_non_completion = str_to_int(json_object['大學(含獨立學院)肄業'])
+    
+    if year != "" and gender != "計":
+        sql_command = f"INSERT INTO edu_level (year, area, gender, literacy, phd_completion, phd_non_completion, ms_completion, ms_non_completion, bs_completion, bs_non_completion) VALUES ('{year}', '{area}', '{gender}', {literacy}, {phd_completion}, {phd_non_completion}, {ms_completion}, {ms_non_completion}, {bs_completion}, {bs_non_completion})"
+        cur.execute(sql_command)
+    
+conn.commit()
+cur.close()
+conn.close()
+       
 print("資料產生完成")
-
-
