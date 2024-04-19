@@ -1,0 +1,1 @@
+docker exec -it nutn-my-postgres-container psql -U nutn -d nutn
