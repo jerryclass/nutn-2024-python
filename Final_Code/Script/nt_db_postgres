@@ -1,0 +1,41 @@
+#!/bin/bash
+
+IMAGE_NAME="nutn-my-postgres"
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+command=$1
+
+# check container is exist
+check_container_exists() {
+    if docker ps -a --format '{{.Names}}' | grep -q 'nutn-my-postgres-container'; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# install postgres server
+if [[ "$(docker images -q $IMAGE_NAME 2> /dev/null)" == "" ]]; then
+	echo "Docker image $IMAGE_NAME not found. Building..."
+	docker build -f SCRIPT_DIR/../Docker/Postgres/Dockerfile -t $IMAGE_NAME .
+fi
+
+if ! check_container_exists; then
+	docker run --name nutn-my-postgres-container -p 5432:5432 -d $IMAGE_NAME
+fi
+
+if [ "$command" = "start" ]; then
+	echo "start postgres services"
+	docker start nutn-my-postgres-container
+elif [ "$command" = "stop" ]; then
+	echo "stop postgres services"
+	docker stop nutn-my-postgres-container
+elif [ "$command" = "init" ]; then
+	$SCRIPT_DIR/nt_db_postgres stop
+	docker rm nutn-my-postgres-container
+	docker rmi nutn-my-postgres
+	$SCRIPT_DIR/nt_db_postgres start
+else
+	echo "command not found"
+fi
