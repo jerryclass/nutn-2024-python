@@ -5,7 +5,7 @@ FROM python:3.8
 WORKDIR /app
 
 # 安裝 python 額外套件
-RUN pip install requests psycopg2
+RUN pip install requests psycopg2 pandas
 
 # 將當前目錄的檔案複製到工作目錄中
 COPY . .
